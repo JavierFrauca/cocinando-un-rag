@@ -1,0 +1,76 @@
+site_name: Cocinando un RAG
+site_description: >-
+  Las notas del código — la implementación de referencia del método de la serie.
+  Del documento a la píldora, del píldora al índice, del índice a la respuesta:
+  cada decisión de los tres libros, ejecutada y comentada.
+site_author: Javier Frauca & ZCode
+repo_url: https://github.com/JavierFrauca/cocinando-un-rag
+repo_name: JavierFrauca/cocinando-un-rag
+edit_uri: ""
+
+docs_dir: book
+copyright: CC BY-NC-SA 4.0 — Javier Frauca & ZCode
+
+theme:
+  name: material
+  language: es
+  palette:
+    - scheme: slate
+      primary: teal
+      accent: lime
+      toggle:
+        icon: material/weather-night
+        name: Cambiar a modo claro
+    - scheme: default
+      primary: teal
+      accent: lime
+      toggle:
+        icon: material/weather-sunny
+        name: Cambiar a modo oscuro
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - navigation.instant
+    - content.code.copy
+    - content.tabs.link
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - tables
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+
+nav:
+  - Inicio: index.md
+  - Prólogo: 00-prologo.md
+  - "0 · El taller":
+      - "1 · Cómo se lee este libro": 01-como-se-lee-este-libro.md
+      - "2 · La receta entera: el mapa del despacho": 02-la-receta-entera.md
+  - "I · Aprovisionamiento":
+      - "3 · El manifiesto y la ingesta": 03-manifiesto-e-ingesta.md
+      - "4 · Normalización y limpieza": 04-normalizacion-y-limpieza.md
+  - "II · Preparación":
+      - "5 · Del documento a la píldora: el chunking": 05-del-documento-a-la-pildora.md
+      - "6 · El payload que filtra: metaetiquetado": 06-el-payload-que-filtra.md
+      - "7 · La síntesis Gold": 07-la-sintesis-gold.md
+  - "III · Cocción":
+      - "8 · Embeddings: la elección y la cocción": 08-embeddings.md
+      - "9 · El índice: Qdrant y su esquema": 09-el-indice.md
+      - "10 · El ruido y su medición": 10-el-ruido.md
+  - "IV · Servicio":
+      - "11 · La recuperación híbrida con RRF": 11-recuperacion-hibrida.md
+      - "12 · La reescritura de la consulta: la pieza que faltaba": 12-reescritura-de-la-consulta.md
+      - "13 · El rerank y el juez de cosecha": 13-rerank-y-juez.md
+      - "14 · La generación ensamblada": 14-generacion-ensamblada.md
+  - "V · Calidad y gobierno":
+      - "15 · El dataset áureo y la vara, en código": 15-dataset-y-vara.md
+      - "16 · La regresión en CI": 16-regresion-en-ci.md
+      - "17 · El router y la matriz en vivo": 17-router-en-vivo.md
+      - "18 · El panel y el triaje": 18-panel-y-triaje.md
