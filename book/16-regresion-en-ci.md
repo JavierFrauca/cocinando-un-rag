@@ -4,9 +4,11 @@ title: "16 · La regresión en CI"
 
 # 16 · La regresión en CI
 
+Los sistemas que despliegan y miran después descubren sus regresiones en las quejas; los que examinan antes las descubren en la suite, donde cuestan un fallo verde en un panel y no una confianza de usuarios. La lección es del libro 2 (cap. 19) y este capítulo la instala en el lugar donde ya vive en toda disciplina seria: **la integración continua**. Dos puertas en cada cambio — el libro compila en estricto, el código pasa sus pruebas — y entre ellas, la comparación que decide: *cero diferencias sin explicación, no cero diferencias*.
+
 ## La decisión
 
-Ningún cambio sin su número: la regresión bloquea el despliegue **antes** del incidente (libro 2, cap. 19). Y la lección central heredada literal: *cero diferencias sin explicación, no cero diferencias* — la comparación admite el ruido estadístico y bloquea la caída, con la explicación escrita en el veredicto.
+La regresión admite el ruido estadístico y bloquea la caída, con la explicación escrita dentro del veredicto. La decisión de diseño: la tolerancia **vive en el código y está declarada** (`TOLERANCIA = 0.02`), porque una puerta sin margen aprende a ignorarse — cada re-cocción del índice bloquearía por una variación de la tercera decimal, y el equipo haría lo que hacen los equipos con las alarmas ruidosas: desactivarla. Con tolerancia, la caída real no cabe en el ruido: **lo que bloquea, duele; lo que duele, se mira**.
 
 ## El código
 
@@ -63,7 +65,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with: { python-version: "3.12" }
+        with:
+          python-version: "3.12"
       - run: pip install -r requirements.txt
       - run: mkdocs build --strict
   codigo:                         # el código pasa sus puertas de salida
@@ -71,12 +74,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with: { python-version: "3.12" }
+        with:
+          python-version: "3.12"
       - run: pip install pytest sqlite-vec
       - run: pytest -q
 ```
 
-Su prueba:
+Su prueba — los tres futuros posibles de cualquier cambio, en tres asserts:
 
 ```python
 def test_la_regresion_bloquea_la_caida_y_pasa_la_mejora():
@@ -92,14 +96,15 @@ def test_la_regresion_bloquea_la_caida_y_pasa_la_mejora():
 
 ## Lo que importa
 
-1. **La tolerancia está declarada y vale 0,02.** Sin tolerancia, cada re-cocción del índice bloquearía por una variación de la tercera decimal — y el equipo aprendería a ignorar la puerta. Con ella, la caída real no cabe en el ruido: lo que bloquea, duele.
-2. **El veredicto lleva su explicación dentro.** `explicacion` no es un log aparte: es parte del dato que la CI imprime. El "sin explicación" del libro 2 resuelto por construcción — nadie aprueba una regresión sin leer por qué bloqueó.
-3. **Dos trabajos en el Action: el libro y el código.** El libro compila con `--strict` (un enlace roto o un error de markdown no se publica) y el código corre sus 21 pruebas con sqlite-vec y sin claves — los falsos de las pruebas hacen que "saber que vive bien" cueste segundos de CI y cero facturas de API.
-4. **La puerta es la misma para todos los cambios.** Cambiar la plantilla, el embedding, el k o el rerank pasa por `comparar_regresion` con números de la vara — el cap. 8 prometió que el cambio de embeddings sería "un despliegue con regresión", y esta es esa regresión.
+1. **La tolerancia está declarada y vale 0,02.** Sin tolerancia, cada re-cocción del índice bloquearía por una variación de la tercera decimal — y el equipo aprendería a ignorar la puerta. Con ella, la caída real no cabe en el ruido: lo que bloquea, duele. Y el número no es sagrado: con un dataset mayor y más estable, baja; con uno joven, sube — lo que no es negociable es que esté declarado y que la caída se mida contra él.
+2. **El veredicto lleva su explicación dentro.** `explicacion` no es un log aparte: es parte del dato que la CI imprime. El "sin explicación" del libro 2 resuelto por construcción — nadie aprueba una regresión sin leer por qué bloqueó, porque la explicación es el primer campo del veredicto y la última palabra del log rojo.
+3. **Dos trabajos en el Action: el libro y el código.** El libro compila con `--strict` — un enlace roto, un título duplicado o un error de markdown no se publican: el libro es también un artefacto con su puerta. El código corre sus 21 pruebas con sqlite-vec y sin claves — los falsos de las pruebas hacen que "saber que vive bien" cueste segundos de CI y cero facturas de API. La casa entera se verifica en cada push, no en las demos.
+4. **La puerta es la misma para todos los cambios.** Cambiar la plantilla (cap. 14), el embedding (cap. 8), el `k` del tope (cap. 11) o la fusión del híbrido (cap. 11) pasa por `correr_vara` + `comparar_regresion` con números del dataset — el cap. 8 prometió que el cambio de embeddings sería "un despliegue con regresión", y esta es esa regresión. La igualdad de la puerta es lo que la hace creíble: si los cambios "pequeños" se saltan el examen, la vara mide solo lo que ya iba a ir bien.
+5. **Qué ocurre cuando bloquea.** El despliegue no sale; la hipótesis se reescribe. La secuencia del libro 3 para la plantilla sirve entera: hipótesis escrita, examen ejecutado, inventario de cambios clasificado — mejoras, explicados, regresiones — y las regresiones bloquean. El cambio que bloquea dos veces seguidas no es mala suerte: es una señal de que la hipótesis era otra cosa.
 
 ## Los números
 
-La tolerancia del repo es **0,02 de recall** — el ruido que un pequeño cambio de puntuaciones produce sin que nadie toque nada significativo. El dataset del cap. 15 (decenas de entradas) es lo bastante estable para que 0,02 distinga ruido de regresión; con un dataset mayor, la tolerancia puede bajar. El examen completo corre en la CI en **menos de diez segundos** — el examen barato es el que se ejecuta siempre.
+La tolerancia del repo es **0,02 de recall** — el ruido que un pequeño cambio de puntuaciones produce sin que nadie toque nada significativo. El dataset del cap. 15 (decenas de entradas) es lo bastante estable para que 0,02 distinga ruido de regresión; con un dataset mayor, la tolerancia puede bajar. El examen completo corre en la CI en **menos de diez segundos** — libro y código — porque las pruebas no pagan ni modelos ni red: el examen barato es el que se ejecuta siempre, y el que se ejecuta siempre es el que salva el trimestre.
 
 ## Enlaces
 

@@ -4,9 +4,11 @@ title: "14 · La generación ensamblada"
 
 # 14 · La generación ensamblada
 
+La cita decorativa — la referencia plausible que apunta a un documento que nunca se entregó — no nace en la verificación: nace aquí, en la redacción, cuando el modelo compone libre y cita de oído. El antídoto del libro 3 (cap. 13) tiene dos mitades y ambas son de diseño, no de suerte: **la plantilla como contrato versionado** — seis piezas escritas, no improvisadas en un prompt — y **el material citado por construcción** — cada bloque de contexto numerado `[Fuente N]` para que toda afirmación remita a su píldora y toda cita sea verificable por máquina. Este capítulo pone las dos mitades en código, y de propina reúne el servicio entero: las cuatro fases — reescribir, buscar, juzgar, generar — en el orden del método y en ningún otro.
+
 ## La decisión
 
-La plantilla del libro 3 (cap. 13) hecha código: **ensamblar, no componer**. Las seis piezas del contrato de generación — papel, material, prohibiciones, citas, formato, abstención — son un dato versionado, no un string pegado en el código; el material entra citado con sus `[Fuente N]`; y el servicio entero — reescribir, buscar, juzgar, generar — orquesta los puertos en el orden que el método manda y en ningún otro.
+**Ensamlar, no componer.** La plantilla del libro 3 (cap. 13) hecha código con una decisión de arquitectura que lo cruza todo: **la plantilla es un dato** (`PlantillaGeneracion`), no un f-string pegado en el código. Las seis piezas — papel, material, prohibiciones, citas, formato, abstención — versionan, comparan y pasan la regresión del cap. 16 por separado; "cambiar una frase de la plantilla es un despliegue", dice el libro 3, y aquí el diff de ese despliegue se ve línea a línea. La segunda decisión: **la abstención se decide fuera del generador** — el juez habló antes, y si dijo NO_RESPONDE, ni se paga la llamada de redacción. Doble red: el servicio abstiene por veredicto, y la plantilla lleva su regla de abstención por si el modelo se encuentra el vacío dentro de una cosecha parcial.
 
 ## El código
 
@@ -74,7 +76,9 @@ class GeneradorEnsamblado:
         )
 ```
 
-Y el servicio entero, `cocinando/aplicacion/servir.py` — las cuatro fases en el orden del método:
+Las seis piezas de la plantilla se reconocen al instante: el papel con su relación a la verdad, el material con sus reglas de uso de los bloques, las prohibiciones — el inventario de los modos de fallo del cap. 1 del libro 3 traducido a instrucciones —, el grado de cita, el formato de audiencia y la regla de abstención con su condición. No falta ninguna; ninguna sobra.
+
+Y el servicio entero, `cocinando/aplicacion/servir.py` — la orquestación que reúne los caps. 11-13:
 
 ```python
 class ServicioRespuesta:
@@ -100,18 +104,20 @@ class ServicioRespuesta:
         return self.generador.generar(reescrita, cosecha), cosecha  # 6 · ensamblar
 ```
 
-*(El listado del servicio está condensado aquí — el constructor completo está en el repo y las piezas que orquesta son los caps. 11-13.)*
+*(El listado del servicio está condensado aquí — el constructor completo está en el repo, y las piezas que orquesta son los caps. 11-13. La prueba del servicio verifica las tres conductas: el flujo feliz con cosecha citada, la abstención honesta con su motivo, y la reescritura corriendo una vez antes de buscar.)*
 
 ## Lo que importa
 
-1. **La plantilla es un dataclass, no un f-string gigante.** Las seis piezas versionan, comparan y pasan la regresión del cap. 16 por separado — "cambiar una frase de la plantilla es un despliegue", dice el libro 3, y aquí el diff de un despliegue se ve línea a línea.
-2. **La abstención se decide fuera del generador.** El juez habló antes; si dijo NO_RESPONDE, ni se paga la llamada de redacción — el servicio responde la abstención honesta directamente, con su motivo escrito (`"juez: NO_RESPONDE"`) para el diario del cap. 18. La plantilla lleva su regla de abstención por si el modelo se encuentra el vacío dentro de una cosecha parcial: doble red, por si una falla.
-3. **El `temperatura=0` del cliente de chat** — declarado en el cap. 13 y aquí decidivo: la respuesta es un instrumento. La prosa con temperamento es el enemigo que el cap. 13 del libro 3 nombró: fluido no es verdadero.
-4. **El servicio no conoce adaptadores.** Recibe puertos y orquesta: el mismo `ServicioRespuesta` corre con BGE-M3 o con la API, con el juez real o con el falso de las pruebas. Es la prueba de fuego de la arquitectura del cap. 2 — y la razón por la que las pruebas del sistema entero corren sin red ni claves.
+1. **La plantilla es un dataclass, no un f-string gigante.** Las seis piezas versionan, comparan y pasan la regresión del cap. 16 por separado — cambiar la regla de abstención es un diff de una línea con su hipótesis escrita. Es la diferencia entre "toca el prompt y reza" y el cap. 13 del libro 3 entero: hipótesis, regresión, despliegue. Las plantillas que crecen por parches de urgencia son el equivalente exacto del corpus sin manifiesto.
+2. **La abstención se decide fuera del generador.** El juez habló antes; si dijo NO_RESPONDE, ni se paga la llamada de redacción — el servicio responde la abstención honesta directamente, con su motivo escrito (`"juez: NO_RESPONDE"`) para el diario del cap. 18. La plantilla lleva su regla de abstención por si el modelo se encuentra el vacío dentro de una cosecha parcial: doble red, por si una falla. Y la abstención del servicio es de las buenas: **nombra lo más cercano que contiene** — el "no" que orienta.
+3. **El `temperatura=0` del cliente de chat — declarado en el cap. 13 y aquí decidivo.** La respuesta es un instrumento, no una prosa: mismo cosecha, mismo respuesta, para que la regresión compare cambios del sistema y no estados de ánimo del modelo. La prosa con temperamento es el enemigo que el cap. 13 del libro 3 nombró: fluido no es verdadero.
+4. **El servicio no conoce adaptadores.** Recibe puertos y orquesta: el mismo `ServicioRespuesta` corre con BGE-M3 o con la API, con el juez real o con el falso de las pruebas. Es la prueba de fuego de la arquitectura del cap. 2 — y la razón por la que las pruebas del sistema entero corren sin red ni claves. Cuando toque cambiar el motor o el modelo, el cambio es de fábrica; el orden de las fases no se toca.
+5. **El orden de las fases no se negocia.** Reescribir ANTES de buscar (la mejor formulación merece la búsqueda), juzgar ANTES de generar (el veredicto barato antes que la redacción cara), abstenerse ANTES de componer (el vacío no se rellena). Invertir el orden no rompe el código: rompe el método — y sus facturas.
+6. **Lo que el generador NO hace.** No verifica sus citas — esa es la vara de fidelidad del cap. 14 del libro 3, que en esta implementación queda para la siguiente versión del repo (declarado, no fingido): el bloque de verificación de la respuesta — fidelidad frase a frase y control de contradicciones — es la pieza que falta entre este capítulo y el 15. Lo que sí devuelve es la cosecha entera junto a la respuesta, para que esa verificación futura tenga su material.
 
 ## Los números
 
-Una respuesta completa del servicio cuesta en el sistema real: **1 llamada de reescritura + 1 de incrustación + 2 consultas SQLite + 1 veredicto + 1 redacción** — cinco llamadas en el orden de segundos, el directo del espectro del libro 3 con toda su ceremonia. La vara de coste la pone el cap. 10 del libro 3: el patrón caro solo donde la pregunta lo exige.
+Una respuesta completa del servicio cuesta en el sistema real: **1 llamada de reescritura + 1 de incrustación + 2 consultas SQLite + 1 veredicto + 1 redacción** — cinco llamadas en el orden de segundos, el directo del espectro del libro 3 con toda su ceremonia. La vara de coste la pone el cap. 10 del libro 3: el patrón caro solo donde la pregunta lo exige — y la escena del cap. 11 de este libro (el router) es quien decide qué consulta paga esta coreografía entera y cuál se va al directo en tres segundos.
 
 ## Enlaces
 

@@ -4,9 +4,11 @@ title: "9 · El índice: FTS5 + sqlite-vec, un archivo"
 
 # 9 · El índice: FTS5 + sqlite-vec, un archivo
 
+"Primero, instala Docker. Después, levanta el contenedor del motor vectorial. Después, configura el cluster." — así empiezan casi todos los tutoriales de RAG, y así muere la mitad de ellos: en la infraestructura, antes del método. Este capítulo empieza de otra manera: `pip install sqlite-vec`, y el lector tiene **un índice vectorial + un índice léxico BM25 en un solo archivo** que puede copiar, versionar y llevarse en el bolsillo. El archivo es la base de datos; el método es el que manda. Y cuando el día de mañana el corpus crezca más allá de lo que la fuerza bruta padece bien, Qdrant — el motor del sistema real — cabe detrás de la misma interfaz sin reescribir nada de método.
+
 ## La decisión
 
-El doble campo del libro 1 — el texto para leer y el vector para buscar — hecho índice real: **FTS5** para el canal léxico y **sqlite-vec** para el denso, en el mismo fichero SQLite. Sin servidor, sin contenedor, sin cuenta: `pip install sqlite-vec` y el lector tiene un índice vectorial en su portátil. Y como el repositorio es el puerto del dominio, Qdrant — el motor del sistema real — cabe detrás de la misma interfaz: cambiar de motor es un despliegue con regresión, no una reescritura.
+El doble campo del libro 1 — el texto para leer y el vector para buscar — hecho índice real: **FTS5** para el canal léxico y **sqlite-vec** para el denso, en el mismo fichero SQLite. Sin servidor, sin contenedor, sin cuenta. Los límites, dichos de entrada y sin maquillaje: el KNN de sqlite-vec es por fuerza bruta (perfecto hasta decenas de miles de píldoras, no para millones) y SQLite escribe en solitario. Ninguno de los dos límites importa en un libro de pruebas y en un corpus de despacho; ambos importarían en producción — y por eso el repositorio es el **puerto** del dominio con esta clase como primera implementación: cambiar de motor es un despliegue con regresión, no una reescritura.
 
 ## El código
 
@@ -104,6 +106,8 @@ class RepositorioPildorasSqlite:
         return self.conn.execute("SELECT COUNT(*) FROM pildoras").fetchone()[0]
 ```
 
+Cómo se leerlo: tres tablas con papeles claros. `pildoras` es la verdad — el texto y el payload del cap. 6; `pildoras_fts` es el canal léxico, una tabla virtual FTS5 con el texto y el título indexados; `pildoras_vec` es el canal denso, la tabla virtual vec0 con el embedding. El `guardar` escribe en las tres dentro de una transacción: o la píldora existe en los tres sitios o en ninguno. Con un motor externo, esa atomicidad sería infraestructura; aquí es una transacción.
+
 Y su prueba de puerta — la ingesta idempotente vista desde el índice:
 
 ```python
@@ -115,15 +119,16 @@ def test_ingesta_idempotente(repo):
 
 ## Lo que importa
 
-1. **Tres tablas, un solo fichero.** `pildoras` (el texto y el payload), `pildoras_fts` (el canal léxico) y `pildoras_vec` (el canal denso) comparten SQLite: la transacción que guarda una píldora la escribe en los tres sitios o en ninguno. Con un motor externo, esa atomicidad sería infraestructura; aquí es una transacción.
-2. **El `INSERT OR REPLACE` por id de contenido ES la idempotencia.** No hay lógica de "¿ya existe?": el id del cap. 5 ya responde. Re-ingestar el corpus entero cada noche es seguro por construcción — y la prueba lo demuestra con dos ingestas seguidas y un `contar()` que no se mueve.
-3. **El vector va empaquetado como floats nativos.** `struct.pack` de la lista: sqlite-vec consume el formato binario sin convertir a JSON — la diferencia entre una cocción de minutos y una de horas sobre el corpus entero.
-4. **El `PRAGMA table_info` antes de crear `pildoras_vec`.** Las tablas virtuales vec0 no se pueden alterar: si mañana cambian las dimensiones del embedding, la tabla vieja no se migra — se recocina. Esta guardia evita el error de crear dos veces y deja la decisión explícita en el cap. 8.
-5. **El límite, escrito en el docstring.** KNN por fuerza bruta: perfecto hasta decenas de miles de píldoras, no para millones, y un escritor a la vez. El libro dice la verdad sobre su herramienta — y la salida de crecimiento es el otro adaptador del puerto, no un parche aquí.
+1. **El `INSERT OR REPLACE` por id de contenido ES la idempotencia.** No hay lógica de "¿ya existe?": el id del cap. 5 ya respondió esa pregunta. Re-ingestar el corpus entero cada noche es seguro por construcción — y la prueba lo demuestra con dos ingestas seguidas y un `contar()` que no se mueve. La deletreada versión (ids posicionales) duplica el índice en cada pasada y el primer síntoma es una respuesta que cita la misma tabla dos veces.
+2. **El vector va empaquetado como floats nativos.** `struct.pack` de la lista: sqlite-vec consume el formato binario sin pasar por JSON — la diferencia entre una cocción de minutos y una de horas sobre el corpus entero. Un detalle de infraestructura, sí; el cap. 10 de este libro existe porque los detalles de cocción se pagan en factura.
+3. **El `PRAGMA table_info` antes de crear `pildoras_vec`.** Las tablas virtuales vec0 no se pueden alterar: si mañana cambian las dimensiones del embedding, la tabla vieja no se migra — se recocina desde cero. Esta guardia evita el error de crear dos veces y deja la decisión explícita donde corresponde: en el cap. 8 y su regresión.
+4. **La atomicidad de las tres escrituras.** `guardar` confirma una única transacción al final: si la cocción muere a mitad de lote, el índice queda como estaba — sin píldoras de texto sin vector, sin vectores huérfanos. Con un motor externo, sincronizar dos índices y una tabla es infraestructura seria; aquí es `commit`.
+5. **El límite, escrito en el docstring y no escondido.** KNN por fuerza bruta: perfecto hasta decenas de miles de píldoras, no para millones, y un escritor a la vez. El libro dice la verdad sobre su herramienta — y la salida de crecimiento es el otro adaptador del puerto, no un parche aquí. El día que el corpus llegue a millones, el capítulo que cambia es el de configuración; este método sigue siendo el mismo.
+6. **El archivo es una ventaja de gobierno, no solo de instalación.** Una base de datos copiable con `cp` se versiona, se respalda y se comparte con el mismo método que el corpus: la copia de seguridad del índice es un documento más. El motor en contenedor necesita su plan de volumen, su red y su monitorización — bien para producción; para aprender, una puerta más antes del método.
 
 ## Los números
 
-Con las píldoras de 1.200 caracteres del cap. 5, el corpus del despacho entero cabe en **un archivo de decenas de megabytes** — copiable, versionable, sin plan de capacidad. La búsqueda híbrida del cap. 11 responde en el orden de milisegundos sobre decenas de miles de píldoras; cuando el día de mañana esa cola sea de millones, el puerto ya sabe hablar con Qdrant.
+Con las píldoras de 1.200 caracteres del cap. 5, el corpus del despacho entero cabe en **un archivo de decenas de megabytes** — copiable, versionable, sin plan de capacidad. La búsqueda híbrida del cap. 11 responde en el orden de **milisegundos** sobre decenas de miles de píldoras (dos consultas indexadas y una fusión en memoria). La cocción completa del corpus con BGE-M3 en CPU lleva el tiempo del modelo, no del índice. Y el número de frontera que conviene vigilar: **píldoras totales** — cuando pase de cinco cifras con crecimiento continuado, es el momento de invitar a Qdrant por el puerto, con la vara del cap. 15 decidiendo.
 
 ## Enlaces
 

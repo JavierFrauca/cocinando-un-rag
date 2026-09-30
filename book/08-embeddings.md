@@ -4,9 +4,11 @@ title: "8 · Embeddings: la elección y la cocción"
 
 # 8 · Embeddings: la elección y la cocción
 
+El embedding nuevo "se notaba mucho mejor" — el equipo lo había probado con cinco consultas a mano y las cinco volaban. La vara del cap. 18 del libro 2 lo midió sobre el dataset completo y el recall cayó tres puntos: volaba en las consultas fáciles y naufragaba en las bordes, que son las que compran la vara. Esta es la escena que este capítulo quiere hacer imposible de repetir: la elección de embeddings no se discute en el folleto ni en la demo — se discute con números del sistema propio, y el cambio se ejecuta como lo que es: **un despliegue con regresión**.
+
 ## La decisión
 
-El puerto `ClienteEmbeddings` con **dos adaptadores**: BGE-M3 local por omisión — gratis, multilingüe, corre en el portátil sin clave; el corpus nunca sale de la máquina — y `text-embedding-3-small` como variante de API. La lección del capítulo no es qué modelo elegir (para eso está la tabla de la web): es que **el cambio de embeddings es un despliegue con regresión**, no una sustitución de piezas transparente — y por eso la ventana y las dimensiones viven en el puerto, no en el servicio.
+El puerto `ClienteEmbeddings` con **dos adaptadores**: BGE-M3 local por omisión — gratis, multilingüe, corre en el portátil sin clave; el corpus nunca sale de la máquina, que en un despacho laboral no es un detalle de marketing — y `text-embedding-3-small` como variante de API. La lección del capítulo no es qué modelo elegir (para eso está la tabla de 11 modelos de la [fase Embedding de la web](https://ragcooking.info/biblioteca/embedding/)): es que **el cambio de embeddings es un despliegue con regresión**, no una sustitución de piezas transparente — y por eso la ventana y las dimensiones viven en el puerto, no en el servicio. El servicio que cocina no sabe qué modelo hay montado; sabe cuánto cabe y cuánto mide.
 
 ## El código
 
@@ -41,7 +43,7 @@ class ClienteEmbeddingsLocal:
         return [v.tolist() for v in vectores]
 ```
 
-Y la variante, `cocinando/infraestructura/embeddings_api.py`:
+Y la variante, `cocinando/infraestructura/embeddings_api.py` — nótese que es idéntica en forma y distinta en números:
 
 ```python
 # cocinando/infraestructura/embeddings_api.py
@@ -72,7 +74,7 @@ class ClienteEmbeddingsApi:
         return [d.embedding for d in respuesta.data]
 ```
 
-La fábrica que decide cuál corre, en `cocinando/infraestructura/configuracion.py`:
+La fábrica que decide cuál corre, en `cocinando/infraestructura/configuracion.py` — la única línea del sistema que sabe qué adaptador está montado:
 
 ```python
 def cliente_embeddings(config: Configuracion | None = None) -> ClienteEmbeddings:
@@ -87,17 +89,18 @@ def cliente_embeddings(config: Configuracion | None = None) -> ClienteEmbeddings
 
 ## Lo que importa
 
-1. **La importación perezosa es honestidad con el lector.** `import cocinando` no descarga 2 GB de modelo ni exige una clave de API: los tests corren con un falso determinista (ver `pruebas/fakes.py`) y el modelo real se carga solo cuando se usa. La dependencia cara existe en el adaptador, no en el dominio.
-2. **La ventana vive en el puerto y manda sobre el chunking.** El límite de tokens del embedding es el techo real del tamaño de la píldora — la fase Embedding de la web lo dice y aquí es código: `cocer()` descarta lo que desborda (cap. 10) porque un vector truncado es una píldora cocida a medias.
-3. **Las dimensiones no son un detalle: son un re-cocinado.** Cambiar de BGE-M3 (1024d) a la API (1536d) invalida el índice entero — los vectores viejos y nuevos no viven en la misma tabla. Por eso `configuracion.py` lleva las dimensiones y el cap. 16 exige regresión: el índice se cocina de nuevo y la vara decide si el cambio merece la pena.
-4. **`normalize_embeddings=True` no es opcional.** Los vectores normalizados hacen que la distancia del coseno y la euclídea ordenen igual — y que las comparaciones de la vara no dependan de la longitud del texto. Sin normalizar, el ranking miente sutilmente y nadie se entera hasta el dataset.
+1. **La importación perezosa es honestidad con el lector.** `import cocinando` no descarga dos gigabytes de modelo ni exige una clave de API: los tests corren con un falso determinista (ver `pruebas/fakes.py`) y el modelo real se carga solo cuando se usa, una vez. La dependencia cara existe en el adaptador, no en el dominio — la misma razón por la que la CI del cap. 16 cuesta segundos y cero facturas.
+2. **La ventana vive en el puerto y manda sobre el chunking.** El límite de tokens del embedding es el techo real del tamaño de la píldora — la fase Embedding de la web lo dice y aquí es código: `cocer()` aparta lo que desborda (cap. 10) porque un vector truncado es una píldora cocida a medias que ocupa índice y no respalda lo que parece respaldar. Por eso `VENTANA_TOKENS` es un atributo del puerto y no una constante suelta: el servicio lo lee de quien esté montado.
+3. **Las dimensiones no son un detalle: son un re-cocinado.** Cambiar de BGE-M3 (1024d) a la API (1536d) invalida el índice entero — los vectores viejos y nuevos no viven en la misma tabla ni hablan el mismo espacio. Por eso `configuracion.py` lleva las dimensiones, el cap. 9 guarda la guardia del esquema, y el cap. 16 exige regresión: el índice se cocina de nuevo y la vara decide si el cambio merece la pena.
+4. **`normalize_embeddings=True` no es opcional.** Los vectores normalizados hacen que la distancia del coseno y la euclídea ordenen igual — y que las comparaciones de la vara no dependan de la longitud del texto. Sin normalizar, el ranking miente sutilmente a favor de los textos largos, y nadie se entera hasta que el dataset lo dice.
+5. **La elección, cuando toque, se hace con la vara — no con la tabla.** La tabla de la web sirve para descartar (sin multilingüe, no; con 512 tokens y píldoras de 300, no) y para presupuestar. La elección final es `correr_vara` del cap. 15 con el dataset propio: dos candidatos, dos cocciones, un recall comparado. El "se nota mucho mejor" no es un argumento; es el síntoma de que nadie midió.
 
 ## Los números
 
-Valores por omisión del repo: **1024 dimensiones** (BGE-M3) y **ventana de 8192 tokens** — que deja a las píldoras del cap. 5 (máximo 1.200 caracteres ≈ 300 tokens) un margen de holgura de más de veinte veces: el título de contexto y el solape no son nunca el problema. En la elección real del despacho pesaron el multilingüe (el corpus tiene catalán y euskera en las circulares) y el coste cero de re-cocinado; la tabla de decisión completa, en la [fase Embedding de la web](https://ragcooking.info/biblioteca/embedding/).
+Valores por omisión del repo: **1024 dimensiones** (BGE-M3) y **ventana de 8192 tokens** — que deja a las píldoras del cap. 5 (máximo 1.200 caracteres ≈ 300 tokens) un margen de holgura de más de veinte veces: el título de contexto y el solape no son nunca el problema. En la elección real del despacho pesaron el multilingüe (el corpus tiene catalán y euskera en las circulares — un embedding solo inglés habría creado dos clases de píldoras: las que se encuentran y las que no) y el coste cero de re-cocinado. El coste de la variante API se paga en céntimos por millón de tokens, pero también en política: **el corpus sale del portátil** — y en un despacho, esa línea del presupuesto no está en dinero.
 
 ## Enlaces
 
 - Repo: `cocinando/infraestructura/embeddings_local.py` · `embeddings_api.py` · `configuracion.py`
 - Web: fase [Embedding](https://ragcooking.info/biblioteca/embedding/) — la tabla de 11 modelos con ventanas y dimensiones
-- Libro 2, cap. 12: el híbrido que se cocina con estos vectores · Libro 2, cap. 19: el cambio con regresión obligada
+- Libro 2, cap. 12: el híbrido que se cocina con estos vectores · Libro 2, cap. 18: la vara que elige · Libro 2, cap. 19: el cambio con regresión obligada
