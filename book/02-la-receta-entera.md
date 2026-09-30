@@ -46,6 +46,11 @@ Las decisiones de taller de esta implementación de referencia, dichas claras �
 El código de los ejemplos se organiza en tres capas — y dentro de ellas, en el orden que el método manda:
 
 ```text
+sembrar.py               el arranque en un minuto: siembra la base con el corpus de ejemplo
+datos/
+  corpus/                tres documentos de ejemplo (convenio, sentencia, circular)
+  manifiesto.json        el pacto del cap. 3, con datos de ejemplo
+  dataset.json           tres consultas firmadas para la vara
 cocinando/
   dominio/                  ← lo que no envejece: el método sin I/O
     modelos.py              todos los dataclasses: Píldora, Hit, Veredicto, Respuesta
@@ -63,10 +68,13 @@ cocinando/
     sqlite_repo.py          caps. 9, 11 FTS5 + sqlite-vec: dos canales, un archivo
     embeddings_local.py     cap. 8      BGE-M3 (por omisión)
     embeddings_api.py       cap. 8      text-embedding-3-small (variante)
+    embeddings_demo.py      sembrar.py  hash determinista: pruebas y demo, sin red
     llm.py                  caps. 13-14 el juez de cosecha y la generación
     configuracion.py        modelos y motores en un solo sitio: cambio con regresión
-pruebas/                    ← la puerta de salida de cada capítulo
+pruebas/                    ← la puerta de salida de cada capítulo (24 en total)
 ```
+
+**El arranque en un minuto.** `python sembrar.py --consultar "plazo de reclamación" --vara` siembra la base con el corpus de ejemplo, corre una consulta de muestra y mide la vara sobre tres consultas firmadas — sin descargar modelo ni pedir clave (los embeddings de demo son un hash determinista; el `--embeddings local` cocina con BGE-M3 de verdad). La siembra es idempotente: correrla dos veces deja el mismo índice, como manda la ingesta del cap. 3.
 
 Dos convenciones del repo que conviene fijar ahora. **Primera**: cada pieza es importable y probable por separado — ningún capítulo depende de haber ejecutado el anterior, porque cada puerta de salida tiene su prueba. **Segunda**: las dependencias de modelos y motores viven en `configuracion.py`, para que el cambio de embedding o de motor sea un despliegue con regresión — como manda el libro 2 — y no una caza de cadenas de texto.
 

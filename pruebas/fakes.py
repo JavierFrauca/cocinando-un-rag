@@ -8,31 +8,12 @@ sistema real; aquí se prueba el método.
 
 from __future__ import annotations
 
-import hashlib
-
 from cocinando.dominio.modelos import Consulta, Hit, Respuesta, Veredicto
+from cocinando.infraestructura.embeddings_demo import ClienteEmbeddingsDemo
 
-
-class EmbeddingsFalsos:
-    """Vectores deterministas a partir de los tokens: misma palabra, mismo trozo.
-
-    Suficiente para que el canal denso tenga señal en las pruebas;
-    el canal léxico (FTS5) hace el resto del trabajo real.
-    """
-
-    VENTANA_TOKENS = 8192
-    DIMENSIONES = 64
-
-    def incrustar(self, textos: list[str]) -> list[list[float]]:
-        return [self._uno(t) for t in textos]
-
-    def _uno(self, texto: str) -> list[float]:
-        vector = [0.0] * self.DIMENSIONES
-        for token in texto.lower().split():
-            digesto = int(hashlib.md5(token.encode()).hexdigest(), 16)
-            vector[digesto % self.DIMENSIONES] += 1.0
-        norma = sum(v * v for v in vector) ** 0.5 or 1.0
-        return [v / norma for v in vector]
+# El doble de embeddings ES el adaptador de demostración del paquete:
+# el mismo código sirve para las pruebas y para `sembrar.py --embeddings demo`.
+EmbeddingsFalsos = ClienteEmbeddingsDemo
 
 
 class ReescritorFalso:

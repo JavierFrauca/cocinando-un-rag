@@ -20,7 +20,7 @@ def cocer(pildoras: list[Pildora], embeddings: ClienteEmbeddings,
     Los lotes existen por dos razones de método: el error de una llamada
     no tira la cocción entera, y la factura es legible lote a lote.
     """
-    embudo = [RegistroEmbudo("cocer", len(pildoras), 0)]
+    embudo = [RegistroEmbudo("cocer", len(pildoras), len(pildoras))]
     vivas = [p for p in pildoras if len(p.texto) <= embeddings.VENTANA_TOKENS * 4]
     embudo.append(RegistroEmbudo("ventana", len(pildoras), len(vivas)))
 

@@ -17,9 +17,33 @@ El catálogo de ingredientes vive en [ragcooking.info](https://ragcooking.info/)
 
 ## Ejecutar los ejemplos
 
+**Arranque en un minuto** — siembra la base con el corpus de ejemplo, sin modelos ni claves:
+
 ```bash
-pip install pytest sqlite-vec          # lo mínimo: la suite completa corre sin red ni claves
-pytest -q                              # 21 pruebas en verde
+python sembrar.py --consultar "plazo de reclamación" --vara
+```
+
+```
+cocer: 11/11 (ruido 0.0%)
+ventana: 11/11 (ruido 0.0%)
+indexado: 11/11 (ruido 0.0%)
+Base sembrada en cocinando.db: 11 píldoras de 3 fuentes declaradas en el manifiesto.
+
+Vara sobre el dataset de ejemplo: recall@10 = 0.67 · MRR = 0.20 sobre 3 consultas firmadas.
+
+«plazo de reclamación»
+  0.0306 [denso+lexico] Sentencia 88/2023 … > Fallo
+  0.0305 [denso+lexico] Sentencia 88/2023 … > Fundamentos de derecho
+  ...
+```
+
+La siembra es idempotente (dos veces = el mismo índice). Con `--embeddings local` lo mismo con BGE-M3 de verdad; el corpus de ejemplo vive en [`datos/`](datos/) — sustitúyelo por el tuyo editando `datos/corpus/` y `datos/manifiesto.json`.
+
+**La suite completa** — corre sin red ni claves:
+
+```bash
+pip install pytest sqlite-vec
+pytest -q                              # 24 pruebas en verde
 
 pip install -r requirements-examples.txt   # lo completo: BGE-M3 y la variante de API
 ```

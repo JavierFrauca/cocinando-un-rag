@@ -1,0 +1,5 @@
+{
+  "datos/corpus/convenio_2024.md": {"dominio": "convenios", "vigencia": "2027-12-31"},
+  "datos/corpus/sentencia_88_2023.md": {"dominio": "sentencias", "vigencia": null},
+  "datos/corpus/circular_rh_2025.md": {"dominio": "circulares", "vigencia": "2027-03-31"}
+}
