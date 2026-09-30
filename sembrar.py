@@ -10,6 +10,10 @@ El arranque en un minuto, desde la raíz del repositorio:
 La siembra es idempotente: correrla dos veces deja el mismo índice —
 la misma promesa de la ingesta del cap. 3, ahora para el arranque entero.
 Con `--embeddings demo` no se descarga ningún modelo ni se pide ninguna clave.
+
+Nota: los datos de `datos/` son de demostración — existen para ver el sistema
+funcionar de punta a punta, y las métricas que imprime con embeddings de demo
+son de juguete. El corpus de verdad es el tuyo: `datos/corpus/` + manifiesto.
 """
 
 from __future__ import annotations

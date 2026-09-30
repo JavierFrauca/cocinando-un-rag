@@ -37,7 +37,7 @@ Vara sobre el dataset de ejemplo: recall@10 = 0.67 · MRR = 0.20 sobre 3 consult
   ...
 ```
 
-La siembra es idempotente (dos veces = el mismo índice). Con `--embeddings local` lo mismo con BGE-M3 de verdad; el corpus de ejemplo vive en [`datos/`](datos/) — sustitúyelo por el tuyo editando `datos/corpus/` y `datos/manifiesto.json`.
+La siembra es idempotente (dos veces = el mismo índice). Con `--embeddings local` lo mismo con BGE-M3 de verdad; el corpus de ejemplo vive en [`datos/`](datos/) — sustitúyelo por el tuyo editando `datos/corpus/` y `datos/manifiesto.json`. **Los datos y las métricas del demo son de demostración**: existen para ver el sistema funcionar de punta a punta — el corpus de verdad es el tuyo, y sus números los firma tu vara.
 
 **La suite completa** — corre sin red ni claves:
 
