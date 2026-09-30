@@ -1,6 +1,6 @@
 # Cocinando un RAG — las notas del código
 
-Cuarto volumen de la serie ([*El Origen del Conocimiento*](https://javierfrauca.github.io/el-origen-del-conocimiento/) · [*Accediendo al Conocimiento*](https://javierfrauca.github.io/accediendo-al-conocimiento/) · *Aplicando el Conocimiento* · este).
+Cuarto volumen de la serie ([*El Origen del Conocimiento*](https://javierfrauca.github.io/el-origen-del-conocimiento/) · [*Accediendo al Conocimiento*](https://javierfrauca.github.io/accediendo-al-conocimiento/) · [*Aplicando el Conocimiento*](https://javierfrauca.github.io/aplicando-al-conocimiento/) · este).
 
 Los tres primeros libros enseñan el método **sin código** — qué decidir, en qué orden, con qué evidencia y con qué criterio de salida. Este libro es otro género a propósito: **las notas del código**. No es un tutorial paso a paso ni un manual de framework: es el comentario anotado de una **implementación de referencia** que ejecuta el método completo — del documento a la píldora, de la píldora al índice, del índice a la respuesta — sobre el sistema real de la serie: el RAG de un despacho laboral en producción.
 
