@@ -87,7 +87,7 @@ def trocear(documento: str, fuente: str, dominio: str = "",
     return pildoras
 ```
 
-Cómo se leerlo: la función es una máquina de tres estados — texto abierto, tabla abierta, encabezado recién llegado — y cada línea del documento dispara una de tres acciones: cerrar y abrir (encabezado), acumular (línea cualquiera) o cerrar por guardia (tamaño desbordado). Toda la inteligencia está en **cuándo se llama a `cerrar`**: esa función es la única que crea píldoras, y los cuatro sitios desde los que se invoca son las cuatro razones por las que una píldora termina — encabezado nuevo, inicio de tabla, fin de tabla, desborde de tamaño.
+Cómo leerlo: la función es una máquina de tres estados — texto abierto, tabla abierta, encabezado recién llegado — y cada línea del documento dispara una de tres acciones: cerrar y abrir (encabezado), acumular (línea cualquiera) o cerrar por guardia (tamaño desbordado). Toda la inteligencia está en **cuándo se llama a `cerrar`**: esa función es la única que crea píldoras, y los cuatro sitios desde los que se invoca son las cuatro razones por las que una píldora termina — encabezado nuevo, inicio de tabla, fin de tabla, desborde de tamaño.
 
 Y su puerta de salida, `pruebas/test_pildoras.py` — tres pruebas que son el criterio de salida de la fase hecho `assert`:
 

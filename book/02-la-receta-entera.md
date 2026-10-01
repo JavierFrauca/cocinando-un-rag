@@ -71,7 +71,7 @@ cocinando/
     embeddings_demo.py      sembrar.py  hash determinista: pruebas y demo, sin red
     llm.py                  caps. 13-14 el juez de cosecha y la generación
     configuracion.py        modelos y motores en un solo sitio: cambio con regresión
-pruebas/                    ← la puerta de salida de cada capítulo (24 en total)
+pruebas/                    ← la puerta de salida de cada capítulo (26 en total)
 ```
 
 **El arranque en un minuto.** `python sembrar.py --consultar "plazo de reclamación" --vara` siembra la base con el corpus de ejemplo, corre una consulta de muestra y mide la vara sobre tres consultas firmadas — sin descargar modelo ni pedir clave (los embeddings de demo son un hash determinista; el `--embeddings local` cocina con BGE-M3 de verdad). La siembra es idempotente: correrla dos veces deja el mismo índice, como manda la ingesta del cap. 3.

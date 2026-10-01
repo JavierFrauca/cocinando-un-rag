@@ -4,7 +4,7 @@ Cuarto volumen de la serie ([*El Origen del Conocimiento*](https://javierfrauca.
 
 Los tres primeros libros enseñan el método **sin código** — qué decidir, en qué orden, con qué evidencia y con qué criterio de salida. Este libro es otro género a propósito: **las notas del código**. No es un tutorial paso a paso ni un manual de framework: es el comentario anotado de una **implementación de referencia** que ejecuta el método completo — del documento a la píldora, de la píldora al índice, del índice a la respuesta — sobre el sistema real de la serie: el RAG de un despacho laboral en producción.
 
-**Libro y código viven juntos**: los listados de cada capítulo son el paquete [`cocinando/`](cocinando/) de este mismo repositorio, con sus [pruebas](pruebas/) — 21 puertas de salida que la [CI](.github/workflows/ci.yml) ejecuta en cada cambio (`mkdocs build --strict` para el libro, `pytest` para el código).
+**Libro y código viven juntos**: los listados de cada capítulo son el paquete [`cocinando/`](cocinando/) de este mismo repositorio, con sus [pruebas](pruebas/) — 26 puertas de salida que la [CI](.github/workflows/ci.yml) ejecuta en cada cambio (`mkdocs build --strict` para el libro, `pytest` para el código, y una prueba de sincronía que verifica que cada listado del libro es el código real del paquete).
 
 ## Con qué se cocina
 
@@ -43,7 +43,7 @@ La siembra es idempotente (dos veces = el mismo índice). Con `--embeddings loca
 
 ```bash
 pip install pytest sqlite-vec
-pytest -q                              # 24 pruebas en verde
+pytest -q                              # 26 pruebas en verde
 
 pip install -r requirements-examples.txt   # lo completo: BGE-M3 y la variante de API
 ```

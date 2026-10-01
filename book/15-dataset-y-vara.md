@@ -69,7 +69,7 @@ def correr_vara(dataset: list[EntradaDataset], embeddings: ClienteEmbeddings,
     return Metricas(recall_k=aciertos_recall / n, mrr=inversos / n, k=k, consultas=n)
 ```
 
-Cómo se leerlo: dos métricas en un solo pase, porque comparten cosecha. El **recall@k** suma, por consulta, la fracción de las verdades que aparecieron dentro del tope — la métrica del olvido: la evidencia existía y no llegó. La **MRR** toma el inverso del puesto del primer acierto — 1 si salió primera, 0,2 si salió quinta, 0 si no salió — la métrica de la cabeza: la que captura la experiencia de quien pregunta, porque nadie mira el puesto nueve.
+Cómo leerlo: dos métricas en un solo pase, porque comparten cosecha. El **recall@k** suma, por consulta, la fracción de las verdades que aparecieron dentro del tope — la métrica del olvido: la evidencia existía y no llegó. La **MRR** toma el inverso del puesto del primer acierto — 1 si salió primera, 0,2 si salió quinta, 0 si no salió — la métrica de la cabeza: la que captura la experiencia de quien pregunta, porque nadie mira el puesto nueve.
 
 Y su prueba — la vara mide de verdad sobre un corpus de juguete, y se niega a lo anónimo:
 

@@ -48,7 +48,7 @@ Cada capítulo es una pieza de la implementación, siempre con la misma anatomí
 
 ## Estado
 
-✅ **Borrador completo** — prólogo, método de lectura, mapa y 17 capítulos con su código; la implementación de referencia (`cocinando/`) vive en este mismo repositorio con sus 21 pruebas y su CI. Pendiente de revisión final y de publicar el sitio.
+✅ **Borrador completo** — prólogo, método de lectura, mapa y 17 capítulos con su código; la implementación de referencia (`cocinando/`) vive en este mismo repositorio con sus 26 pruebas y su CI. Pendiente de revisión final y de publicar el sitio.
 
 ## Licencia y citación
 

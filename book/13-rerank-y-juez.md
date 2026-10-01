@@ -63,7 +63,7 @@ class JuezCosechaLLM(JuezCosecha):
             return Veredicto.PARCIAL   # un juez ininteligible no es libre: es parcial de fábrica
 ```
 
-Cómo se leerlo: el método hace tres cosas y su orden es el diseño. La guardia de la primera línea — cosecha vacía, `NO_RESPONDE` sin gastar una llamada. El montaje del material numerado — el juez ve cada píldora con su título, porque juzgar texto sin contexto es juzgar a ciegas, y el libro 2 prohibió juzgar a ciegas. Y el parseo defensivo — la respuesta del modelo se limpia, se mayusculiza, se toma su primera palabra y se convierte en `Veredicto`; lo que no convierta, no es RESPONDE por cortesía: es PARCIAL.
+Cómo leerlo: el método hace tres cosas y su orden es el diseño. La guardia de la primera línea — cosecha vacía, `NO_RESPONDE` sin gastar una llamada. El montaje del material numerado — el juez ve cada píldora con su título, porque juzgar texto sin contexto es juzgar a ciegas, y el libro 2 prohibió juzgar a ciegas. Y el parseo defensivo — la respuesta del modelo se limpia, se mayusculiza, se toma su primera palabra y se convierte en `Veredicto`; lo que no convierta, no es RESPONDE por cortesía: es PARCIAL.
 
 ## Lo que importa
 
