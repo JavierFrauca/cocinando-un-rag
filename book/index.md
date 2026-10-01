@@ -7,6 +7,8 @@ description: Las notas del código — la implementación de referencia del mét
 
 ### Las notas del código — la implementación de referencia del método de la serie
 
+![Portada](portada.png){ width="420" }
+
 ---
 
 Los tres libros anteriores no contienen ni una línea de código, y lo declaran sin disimulo: *método, criterio y plantillas*. Este libro es la otra mitad del pacto: **el código que ejecuta ese método**, con sus anotaciones — no un tutorial que copiar, sino las notas de taller sobre las partes que más importan, tal como quedaron escritas en el RAG real de un despacho laboral.
