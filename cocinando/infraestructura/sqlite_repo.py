@@ -12,6 +12,7 @@ decenas de miles de píldoras; no para millones) y un escritor a la vez.
 from __future__ import annotations
 
 import sqlite3
+import struct
 from pathlib import Path
 
 from cocinando.dominio.modelos import Hit, Pildora
@@ -93,7 +94,7 @@ class RepositorioPildorasSqlite:
             )
             cur.execute(
                 "INSERT INTO pildoras_vec (rowid, embedding) VALUES (?, ?)",
-                (rowid, __import__("struct").pack(f"{len(vector)}f", *vector)),
+                (rowid, struct.pack(f"{len(vector)}f", *vector)),
             )
         self.conn.commit()
 
@@ -115,7 +116,6 @@ class RepositorioPildorasSqlite:
         Un Hit que salió por los dos canales lo declara en `canales` —
         y suele ser la mejor señal de pertinencia que existe.
         """
-        import struct
 
         candidato_x, filtro = k * 4, ""        # margen para que el filtro no vacíe el corte
         params_denso: list = [struct.pack(f"{len(vector)}f", *vector), candidato_x]

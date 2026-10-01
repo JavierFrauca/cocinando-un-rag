@@ -21,6 +21,7 @@ El doble campo del libro 1 — el texto para leer y el vector para buscar — he
 from __future__ import annotations
 
 import sqlite3
+import struct
 from pathlib import Path
 
 from cocinando.dominio.modelos import Hit, Pildora
@@ -106,7 +107,7 @@ class RepositorioPildorasSqlite:
         return self.conn.execute("SELECT COUNT(*) FROM pildoras").fetchone()[0]
 ```
 
-Cómo se leerlo: tres tablas con papeles claros. `pildoras` es la verdad — el texto y el payload del cap. 6; `pildoras_fts` es el canal léxico, una tabla virtual FTS5 con el texto y el título indexados; `pildoras_vec` es el canal denso, la tabla virtual vec0 con el embedding. El `guardar` escribe en las tres dentro de una transacción: o la píldora existe en los tres sitios o en ninguno. Con un motor externo, esa atomicidad sería infraestructura; aquí es una transacción.
+Cómo leerlo: tres tablas con papeles claros. `pildoras` es la verdad — el texto y el payload del cap. 6; `pildoras_fts` es el canal léxico, una tabla virtual FTS5 con el texto y el título indexados; `pildoras_vec` es el canal denso, la tabla virtual vec0 con el embedding. El `guardar` escribe en las tres dentro de una transacción: o la píldora existe en los tres sitios o en ninguno. Con un motor externo, esa atomicidad sería infraestructura; aquí es una transacción.
 
 Y su prueba de puerta — la ingesta idempotente vista desde el índice:
 

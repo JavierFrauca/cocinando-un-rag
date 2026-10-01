@@ -33,7 +33,7 @@ def cocer(pildoras: list[Pildora], embeddings: ClienteEmbeddings,
     Los lotes existen por dos razones de método: el error de una llamada
     no tira la cocción entera, y la factura es legible lote a lote.
     """
-    embudo = [RegistroEmbudo("cocer", len(pildoras), 0)]
+    embudo = [RegistroEmbudo("cocer", len(pildoras), len(pildoras))]
     vivas = [p for p in pildoras if len(p.texto) <= embeddings.VENTANA_TOKENS * 4]
     embudo.append(RegistroEmbudo("ventana", len(pildoras), len(vivas)))
 
@@ -54,7 +54,7 @@ def leer_embudo(embudo: list[RegistroEmbudo]) -> str:
     )
 ```
 
-Cómo se leerlo: el flujo es lineal — apartar lo que desborda la ventana, incrustar por lotes, indexar, confirmar — y cada paso deja su fila en `embudo`. La función `leer_embudo` es el formato de triaje: una línea por fase con el porcentaje de ruido, para que el diagnóstico quepita en el diario de la semana.
+Cómo leerlo: el flujo es lineal — apartar lo que desborda la ventana, incrustar por lotes, indexar, confirmar — y cada paso deja su fila en `embudo`. La función `leer_embudo` es el formato de triaje: una línea por fase con el porcentaje de ruido, para que el diagnóstico quepita en el diario de la semana.
 
 ## Lo que importa
 
@@ -66,7 +66,7 @@ Cómo se leerlo: el flujo es lineal — apartar lo que desborda la ventana, incr
 
 ## Los números
 
-En una ingesta sana del despacho, el ruido de la fase **ventana es ~0%** — las píldoras del cap. 5 (máximo 1.200 caracteres contra 8.192 tokens de ventana) no rozan el techo. Si ese porcentaje deja de ser ~0, no es un problema de embeddings: es la estructura de encabezados de algún documento degradada. El **LOTE=64** del repo es un equilibrio de arranque — lotes más grandes cocinan más rápido y diagnosticán peor; el número que conviene vigilar una vez en producción es el coste por lote de la factura de embeddings, que con la variante local es cero y con la API se lee línea a línea.
+En una ingesta sana del despacho, el ruido de la fase **ventana es ~0%** — las píldoras del cap. 5 (máximo 1.200 caracteres contra 8.192 tokens de ventana) no rozan el techo. Si ese porcentaje deja de ser ~0, no es un problema de embeddings: es la estructura de encabezados de algún documento degradada. El **LOTE=64** del repo es un equilibrio de arranque — lotes más grandes cocinan más rápido y diagnostican peor; el número que conviene vigilar una vez en producción es el coste por lote de la factura de embeddings, que con la variante local es cero y con la API se lee línea a línea.
 
 ## Enlaces
 

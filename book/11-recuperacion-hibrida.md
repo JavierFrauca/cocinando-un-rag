@@ -33,7 +33,6 @@ def buscar_hibrido(
     Un Hit que salió por los dos canales lo declara en `canales` —
     y suele ser la mejor señal de pertinencia que existe.
     """
-    import struct
 
     candidato_x, filtro = k * 4, ""        # margen para que el filtro no vacíe el corte
     params_denso: list = [struct.pack(f"{len(vector)}f", *vector), candidato_x]
@@ -94,7 +93,7 @@ def _fundir(self, denso: dict[str, float], lexico: dict[str, float],
     ]
 ```
 
-Cómo se leerlo: dos consultas paralelas — cada canal trae su propio ranking con `candidato_x = k * 4` puestos — y una fusión que solo mira posiciones: el primer puesto de cada canal aporta `1/61`, el segundo `1/62`, y así. Quien sale bien en los dos canales suma dos veces; quien solo sale en uno, compite con lo que aportó. Al final, los píldoras completas se traen del índice en una única consulta y se devuelven ordenadas hasta `k`.
+Cómo leerlo: dos consultas paralelas — cada canal trae su propio ranking con `candidato_x = k * 4` puestos — y una fusión que solo mira posiciones: el primer puesto de cada canal aporta `1/61`, el segundo `1/62`, y así. Quien sale bien en los dos canales suma dos veces; quien solo sale en uno, compite con lo que aportó. Al final, las píldoras completas se traen del índice en una única consulta y se devuelven ordenadas hasta `k`.
 
 ## Lo que importa
 
